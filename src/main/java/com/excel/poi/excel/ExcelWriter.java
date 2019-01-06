@@ -122,10 +122,12 @@ public class ExcelWriter {
                     calculateColumWidth(cell, j);
                 }
                 if (nullCellCount == propertyList.size()) {
+                    log.warn("忽略一行空数据!");
                     sheet.removeRow(row);
-                } else {
-                    nullCellCount = 0;
+                    rowNum--;
                 }
+                nullCellCount = 0;
+
             }
             if (data.size() < pageSize) {
                 sizeColumWidth(sheet, propertyList.size());
@@ -208,10 +210,11 @@ public class ExcelWriter {
                     calculateColumWidth(cell, j);
                 }
                 if (nullCellCount == propertyList.size()) {
+                    log.warn("忽略一行空数据!");
                     sheet.removeRow(bodyRow);
-                } else {
-                    nullCellCount = 0;
+                    rowNum--;
                 }
+                nullCellCount = 0;
             }
             if (data.size() < pageSize) {
                 sizeColumWidth(sheet, propertyList.size());
@@ -286,7 +289,7 @@ public class ExcelWriter {
     private void buildCellValue(SXSSFCell cell, Object entity, ExcelPropertyEntity property) throws Exception {
         Field field = property.getFieldEntity();
         Object cellValue = field.get(entity);
-        if (StringUtil.isBlank(cellValue) || "0".equals(cellValue)) {
+        if (StringUtil.isBlank(cellValue) || "0".equals(cellValue.toString())|| "0.0".equals(cellValue.toString())|| "0.00".equals(cellValue.toString())) {
             nullCellCount++;
         }
         if (cellValue == null) {
