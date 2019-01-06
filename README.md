@@ -2,7 +2,9 @@
 
 Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
 
-（如果喜欢或愿意使用, 请star并且Watch本项目, 如果是企业使用, 请通过修改本文件的企业列表告诉我企业名称, 借此给我们鼓励及动力持续维护本项目。）
+**如果喜欢或愿意使用, 请star并且Watch本项目**
+
+**如果是企业使用, 请通过修改本文件的企业列表告诉我企业名称, 借此给我们鼓励及动力持续维护本项目,防止对使用并上线的用户造成损失.**
 
 发现解决bug并已自测,pullRequest后,可以通过邮件告知我们（magic_app@126.com）, 第一时间合并并且发布最新版本
 ## 使用企业列表：
@@ -241,7 +243,7 @@ public class ExportDemo {
 
                         //分页查询操作
 
-                        return new ArrayList<>();
+                        return new ArrayList<AnnotationEntity>();
                     }
 
                     /**
