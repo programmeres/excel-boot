@@ -106,7 +106,7 @@ Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
 <dependency>
 	<groupId>io.github.magic-core</groupId>
 	<artifactId>easy-poi</artifactId>
-	<version>2.0.0</version>
+	<version>2.0</version>
 </dependency>
 ```
 ### @ExportField
