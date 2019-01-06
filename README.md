@@ -89,7 +89,7 @@ Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
     public static final int DEFAULT_RECORD_COUNT_PEER_SHEET = 80000;
 ```
 ## 版本
-当前为1.0.0版本, 2.0.0版正在开发当中
+当前为2.0.0版本,新版本正在开发
 
 ## 使用手册
 1.引入Maven依赖
