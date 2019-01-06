@@ -251,14 +251,18 @@ public class ExcelWriter {
      * @return
      */
     private SXSSFSheet generateHeader(SXSSFWorkbook workbook, List<ExcelPropertyEntity> propertyList, String sheetName) {
+        //创建sheet
         SXSSFSheet sheet = workbook.createSheet(sheetName);
+        //创建行
         SXSSFRow headerRow = sheet.createRow(0);
         headerRow.setHeight((short) 600);
+        //设置第一行属性
         CellStyle headCellStyle = getHeaderCellStyle(workbook);
         for (int i = 0; i < propertyList.size(); i++) {
             SXSSFCell cell = headerRow.createCell(i);
             cell.setCellStyle(headCellStyle);
             cell.setCellValue(propertyList.get(i).getColumnName());
+            //计算列宽
             calculateColumWidth(cell, i);
         }
         return sheet;
@@ -294,20 +298,25 @@ public class ExcelWriter {
     public CellStyle getHeaderCellStyle(SXSSFWorkbook workbook) {
         if (headCellStyle == null) {
             headCellStyle = workbook.getXSSFWorkbook().createCellStyle();
+            //边框
             headCellStyle.setBorderTop(BorderStyle.NONE);
             headCellStyle.setBorderRight(BorderStyle.NONE);
             headCellStyle.setBorderBottom(BorderStyle.NONE);
             headCellStyle.setBorderLeft(BorderStyle.NONE);
+            //上下左右居中
             headCellStyle.setAlignment(HorizontalAlignment.CENTER);// 居中
             headCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);// 居中
+            //填充色-灰色 实线
             XSSFColor color = new XSSFColor(new java.awt.Color(217, 217, 217));
             headCellStyle.setFillForegroundColor(color);
             headCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            //黑色字体、加粗
             Font font = workbook.createFont();
             font.setFontName("微软雅黑");
             font.setColor(IndexedColors.ROYAL_BLUE.index);
             font.setBold(true);
             headCellStyle.setFont(font);
+            //设置单元格格式-文本
             headCellStyle.setDataFormat(workbook.createDataFormat().getFormat("@"));
         }
         return headCellStyle;

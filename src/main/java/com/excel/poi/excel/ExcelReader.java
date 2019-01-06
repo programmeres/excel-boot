@@ -108,6 +108,7 @@ public class ExcelReader extends DefaultHandler {
                     sheetSource = new InputSource(sheet);
                     try {
                         log.info("开始读取第{}个Sheet!", currentSheetIndex + 1);
+                        //解析excel的每条记录，在这个过程中startElement()、characters()、endElement()这三个函数会依次执行
                         parser.parse(sheetSource);
                     } catch (AllEmptyRowException e) {
                         log.warn(e.getMessage());
@@ -152,11 +153,19 @@ public class ExcelReader extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) {
         if (Constant.CELL.equals(name)) {
+            //获得当前坐标,即A1、B1
             String xyz_location = attributes.getValue(Constant.XYZ_LOCATION);
+            // 前一个单元格的坐标
             previousCellLocation = null == previousCellLocation ? xyz_location : currentCellLocation;
+            // 当前单元格的坐标
             currentCellLocation = xyz_location;
             String cellType = attributes.getValue(Constant.CELL_T_PROPERTY);
+            //String cellStyleStr = attributes.getValue(Constant.CELL_S_property);
+            //<c r="A1" t="s"><v>0</v>
+            //当xml中的c节点的属性t的值为字母s时,表示该单元格的值需要在xl/sharedStrings.xml查找,v标签中的值对应sharedStrings的位置,0为第一个
             isNeedSharedStrings = (null != cellType && cellType.equals(Constant.CELL_S_VALUE));
+            // 根据c节点的t属性获取单元格格式
+            //根据c节点的s属性获取单元格样式,去styles.xml文件找相应样式
             setCellType(cellType);
         }
         currentCellValue = "";
@@ -185,11 +194,14 @@ public class ExcelReader extends DefaultHandler {
      */
     @Override
     public void endElement(String uri, String localName, String name) {
+        // 处理单元格数据
         if (Constant.CELL.equals(name)) {
+            //是否有必要去sharedStrings.xml加载真正的值
             if (isNeedSharedStrings && !StringUtil.isBlank(currentCellValue) && StringUtil.isNumeric(currentCellValue)) {
                 int index = Integer.parseInt(currentCellValue);
                 currentCellValue = new XSSFRichTextString(mSharedStringsTable.getEntryAt(index)).toString();
             }
+            //补全一行中间可能缺失的单元格
             if (!currentCellLocation.equals(previousCellLocation) && currentRowIndex != 0) {
                 for (int i = 0; i < countNullCell(currentCellLocation, previousCellLocation); i++) {
                     cellsOnRow.add(excelCurrentCellIndex, "");
@@ -202,7 +214,9 @@ public class ExcelReader extends DefaultHandler {
                 excelCurrentCellIndex++;
             }
         }
+        // 如果标签名称为 row ，这说明已到行尾，通知回调处理当前行的数据
         else if (Constant.ROW.equals(name)) {
+            //默认第一行为表头，以该行单元格数目为最大数目
             if (currentRowIndex == 0) {
                 endCellLocation = currentCellLocation;
                 int propertySize = excelMapping.getPropertyList().size();
@@ -210,6 +224,7 @@ public class ExcelReader extends DefaultHandler {
                     throw new EasyPOIException("Excel有效列数不等于标注注解的属性数量!Excel列数:{},标注注解的属性数量:{}", cellsOnRow.size(), propertySize);
                 }
             }
+            //补全一行尾部可能缺失的单元格
             if (null != endCellLocation) {
                 for (int i = 0; i <= countNullCell(endCellLocation, currentCellLocation); i++) {
                     cellsOnRow.add(excelCurrentCellIndex, "");
@@ -266,7 +281,9 @@ public class ExcelReader extends DefaultHandler {
     }
 
     private void assembleData() throws Exception {
+        //当前行大于等于指定开始行数
         if (currentRowIndex >= beginReadRowIndex) {
+            //补全一行头部可能缺失的单元格
             List<ExcelPropertyEntity> propertyList = excelMapping.getPropertyList();
             for (int i = 0; i < propertyList.size() - cellsOnRow.size(); i++) {
                 cellsOnRow.add(i, "");
@@ -338,6 +355,7 @@ public class ExcelReader extends DefaultHandler {
 
 
     private ErrorEntity checkCellValue(Integer cellIndex, ExcelPropertyEntity mappingProperty, Object cellValue) throws Exception {
+        // required
         Boolean required = mappingProperty.getRequired();
         if (null != required && required) {
             if (null == cellValue || StringUtil.isBlank(cellValue)) {
@@ -347,6 +365,7 @@ public class ExcelReader extends DefaultHandler {
             }
         }
 
+        // regex
         String regex = mappingProperty.getRegex();
         if (!StringUtil.isBlank(cellValue) && !StringUtil.isBlank(regex)) {
             boolean matches = isMatch(regex, cellValue.toString());
@@ -380,6 +399,7 @@ public class ExcelReader extends DefaultHandler {
      * @return
      */
     public int countNullCell(String ref, String ref2) {
+        // excel2007最大行数是1048576，最大列数是16384，最后一列列名是XFD
         String xfd = ref.replaceAll("\\d+", "");
         String xfd_1 = ref2.replaceAll("\\d+", "");
 
@@ -417,6 +437,7 @@ public class ExcelReader extends DefaultHandler {
      * 单元格中的数据可能的数据类型
      */
     enum ExcelCellType {
+        //INLINESTR:常规(无特别指定)
         INLINESTR, STRING, NULL
     }
 
