@@ -105,7 +105,7 @@ public class ExcelWriter {
             int dataSize = data.size();
             for (int i = 1; i <= dataSize; i++, rowNum++) {
                 T queryResult = data.get(i - 1);
-                exportFunction.convert(queryResult);
+                Object convertResult = exportFunction.convert(queryResult);
                 if (rowNum > MAX_RECORD_COUNT_PEER_SHEET) {
                     sizeColumWidth(sheet, propertyList.size());
                     sheet = generateHeader(workbook, propertyList, excelEntity.getFileName() + "_" + sheetNo);
@@ -116,7 +116,7 @@ public class ExcelWriter {
                 SXSSFRow row = sheet.createRow(rowNum);
                 for (int j = 0; j < propertyList.size(); j++) {
                     SXSSFCell cell = row.createCell(j);
-                    buildCellValue(cell, queryResult, propertyList.get(j));
+                    buildCellValue(cell, convertResult, propertyList.get(j));
                     calculateColumWidth(cell, j);
                 }
             }
@@ -186,7 +186,7 @@ public class ExcelWriter {
             }
             for (int i = 1; i <= data.size(); i++, rowNum++) {
                 T queryResult = data.get(i - 1);
-                exportFunction.convert(queryResult);
+                Object convertResult = exportFunction.convert(queryResult);
                 if (rowNum > recordCountPerSheet) {
                     sizeColumWidth(sheet, propertyList.size());
                     sheet = generateHeader(workbook, propertyList, excelEntity.getFileName() + "_" + sheetNo);
@@ -197,7 +197,7 @@ public class ExcelWriter {
                 SXSSFRow bodyRow = sheet.createRow(rowNum);
                 for (int j = 0; j < propertyList.size(); j++) {
                     SXSSFCell cell = bodyRow.createCell(j);
-                    buildCellValue(cell, queryResult, propertyList.get(j));
+                    buildCellValue(cell, convertResult, propertyList.get(j));
                     calculateColumWidth(cell, j);
                 }
             }

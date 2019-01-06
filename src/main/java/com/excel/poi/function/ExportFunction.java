@@ -28,6 +28,6 @@ import java.util.List;
 public interface ExportFunction<P, T> {
     List<T> pageQuery(P param, int pageNum, int pageSize);
 
-    void convert(T queryResult);
+   Object convert(T queryResult);
 
 }

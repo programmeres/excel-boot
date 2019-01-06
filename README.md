@@ -4,7 +4,7 @@ Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
 
 **如果喜欢或愿意使用, 请star并且Watch本项目**
 
-**如果是企业使用, 请通过修改本文件的企业列表告诉我企业名称, 借此给我们鼓励及动力持续维护本项目,防止对使用并上线的用户造成损失.**
+**如果是企业使用, 请通过修改本文件的企业列表告诉我企业名称(非盈利用途).**
 
 发现解决bug并已自测,pullRequest后,可以通过邮件告知我们（magic_app@126.com）, 第一时间合并并且发布最新版本
 ## 使用企业列表：
@@ -104,7 +104,7 @@ Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
 <dependency>
 	<groupId>io.github.magic-core</groupId>
 	<artifactId>easy-poi</artifactId>
-	<version>1.0</version>
+	<version>2.0.0</version>
 </dependency>
 ```
 ### @ExportField
@@ -231,7 +231,7 @@ public class ExportDemo {
     public void exportResponse(HttpServletResponse httpServletResponse) {
         ParamEntity queryQaram = new ParamEntity();
         EasyPoi.ExportBuilder(httpServletResponse, "Excel文件名", AnnotationEntity.class).exportResponse(queryQaram,
-                new ExportFunction<ParamEntity, AnnotationEntity>() {
+                new ExportFunction<ParamEntity, ResultEntity>() {
                     /**
                      * @param queryQaram 查询条件对象
                      * @param pageNum    当前页数,从1开始
@@ -239,11 +239,11 @@ public class ExportDemo {
                      * @return
                      */
                     @Override
-                    public List<AnnotationEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
+                    public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
 
-                        return new ArrayList<AnnotationEntity>();
+                        return new ArrayList<ResultEntity>();
                     }
 
                     /**
@@ -252,7 +252,7 @@ public class ExportDemo {
                      * @param o
                      */
                     @Override
-                    public void convert(AnnotationEntity o) {
+                    public AnnotationEntity convert(ResultEntity o) {
                         //转换操作
                     }
                 });
@@ -266,7 +266,7 @@ public class ExportDemo {
     public void exportMultiSheetResponse(HttpServletResponse httpServletResponse) {
         ParamEntity queryQaram = new ParamEntity();
         EasyPoi.ExportBuilder(httpServletResponse, "Excel文件名", AnnotationEntity.class).exportMultiSheetStream(queryQaram,
-                new ExportFunction<ParamEntity, AnnotationEntity>() {
+                new ExportFunction<ParamEntity, ResultEntity>() {
                     /**
                      * @param queryQaram 查询条件对象
                      * @param pageNum    当前页数,从1开始
@@ -274,11 +274,11 @@ public class ExportDemo {
                      * @return
                      */
                     @Override
-                    public List<AnnotationEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
+                    public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
 
-                        return new ArrayList<AnnotationEntity>();
+                        return new ArrayList<ResultEntity>();
                     }
 
                     /**
@@ -287,7 +287,7 @@ public class ExportDemo {
                      * @param o
                      */
                     @Override
-                    public void convert(AnnotationEntity o) {
+                    public AnnotationEntity convert(ResultEntity o) {
                         //转换操作
                     }
                 });
@@ -299,7 +299,7 @@ public class ExportDemo {
     public void exportStream() throws FileNotFoundException {
         ParamEntity queryQaram = new ParamEntity();
         EasyPoi.ExportBuilder(new FileOutputStream(new File("C:\\Users\\Excel文件.xlsx")), "Sheet名", AnnotationEntity.class)
-                .exportStream(queryQaram, new ExportFunction<ParamEntity, AnnotationEntity>() {
+                .exportStream(queryQaram, new ExportFunction<ParamEntity, ResultEntity>() {
                     /**
                      * @param queryQaram 查询条件对象
                      * @param pageNum    当前页数,从1开始
@@ -307,11 +307,11 @@ public class ExportDemo {
                      * @return
                      */
                     @Override
-                    public List<AnnotationEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
+                    public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
 
-                        return new ArrayList<AnnotationEntity>();
+                        return new ArrayList<ResultEntity>();
                     }
 
                     /**
@@ -320,7 +320,7 @@ public class ExportDemo {
                      * @param o
                      */
                     @Override
-                    public void convert(AnnotationEntity o) {
+                    public ResultEntity convert(ResultEntity o) {
                         //转换操作
                     }
                 });
@@ -333,7 +333,7 @@ public class ExportDemo {
     public void exportMultiSheetStream() throws FileNotFoundException {
         ParamEntity queryQaram = new ParamEntity();
         EasyPoi.ExportBuilder(new FileOutputStream(new File("C:\\Users\\Excel文件.xlsx")), "Sheet名", AnnotationEntity.class)
-                .exportMultiSheetStream(queryQaram, new ExportFunction<ParamEntity, AnnotationEntity>() {
+                .exportMultiSheetStream(queryQaram, new ExportFunction<ParamEntity, ResultEntity>() {
                     /**
                      * @param queryQaram 查询条件对象
                      * @param pageNum    当前页数,从1开始
@@ -341,11 +341,11 @@ public class ExportDemo {
                      * @return
                      */
                     @Override
-                    public List<AnnotationEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
+                    public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
 
-                        return new ArrayList<AnnotationEntity>();
+                        return new ArrayList<ResultEntity>();
                     }
 
                     /**
@@ -354,7 +354,7 @@ public class ExportDemo {
                      * @param o
                      */
                     @Override
-                    public void convert(AnnotationEntity o) {
+                    public AnnotationEntity convert(ResultEntity o) {
                         //转换操作
                     }
                 });
@@ -366,7 +366,7 @@ public class ExportDemo {
     public void generateExcelStream() throws FileNotFoundException {
         ParamEntity queryQaram = new ParamEntity();
         OutputStream outputStream = EasyPoi.ExportBuilder(new FileOutputStream(new File("C:\\Users\\Excel文件.xlsx")), "Sheet名", AnnotationEntity.class)
-                .generateExcelStream(queryQaram, new ExportFunction<ParamEntity, AnnotationEntity>() {
+                .generateExcelStream(queryQaram, new ExportFunction<ParamEntity, ResultEntity>() {
                     /**
                      * @param queryQaram 查询条件对象
                      * @param pageNum    当前页数,从1开始
@@ -374,11 +374,11 @@ public class ExportDemo {
                      * @return
                      */
                     @Override
-                    public List<AnnotationEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
+                    public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
 
-                        return new ArrayList<AnnotationEntity>();
+                        return new ArrayList<ResultEntity>();
                     }
 
                     /**
@@ -387,7 +387,7 @@ public class ExportDemo {
                      * @param o
                      */
                     @Override
-                    public void convert(AnnotationEntity o) {
+                    public AnnotationEntity convert(ResultEntity o) {
                         //转换操作
                     }
                 });
@@ -399,7 +399,7 @@ public class ExportDemo {
     public void generateMultiSheetExcelStream() throws FileNotFoundException {
         ParamEntity queryQaram = new ParamEntity();
         OutputStream outputStream = EasyPoi.ExportBuilder(new FileOutputStream(new File("C:\\Users\\Excel文件.xlsx")), "Sheet名", AnnotationEntity.class)
-                .generateMultiSheetExcelStream(queryQaram, new ExportFunction<ParamEntity, AnnotationEntity>() {
+                .generateMultiSheetExcelStream(queryQaram, new ExportFunction<ParamEntity, ResultEntity>() {
                     /**
                      * @param queryQaram 查询条件对象
                      * @param pageNum    当前页数,从1开始
@@ -407,11 +407,11 @@ public class ExportDemo {
                      * @return
                      */
                     @Override
-                    public List<AnnotationEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
+                    public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
 
-                        return new ArrayList<AnnotationEntity>();
+                        return new ArrayList<ResultEntity>();
                     }
 
                     /**
@@ -420,7 +420,7 @@ public class ExportDemo {
                      * @param o
                      */
                     @Override
-                    public void convert(AnnotationEntity o) {
+                    public AnnotationEntity convert(ResultEntity o) {
                         //转换操作
                     }
                 });
