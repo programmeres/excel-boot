@@ -23,6 +23,7 @@ import static com.excel.poi.common.Constant.CHINESES_ATUO_SIZE_COLUMN_WIDTH_MAX;
 import static com.excel.poi.common.Constant.CHINESES_ATUO_SIZE_COLUMN_WIDTH_MIN;
 import static com.excel.poi.common.Constant.MAX_RECORD_COUNT_PEER_SHEET;
 import static com.excel.poi.common.DateFormatUtil.format;
+import com.excel.poi.common.StringUtil;
 import com.excel.poi.entity.ExcelEntity;
 import com.excel.poi.entity.ExcelPropertyEntity;
 import com.excel.poi.function.ExportFunction;
@@ -60,6 +61,7 @@ public class ExcelWriter {
     private Integer rowAccessWindowSize;
     private ExcelEntity excelEntity;
     private Integer pageSize;
+    private Integer nullCellCount = 0;
     private Integer recordCountPerSheet;
     private XSSFCellStyle headCellStyle;
     private Map<Integer, Integer> columnWidthMap = new HashMap<Integer, Integer>();
@@ -119,6 +121,13 @@ public class ExcelWriter {
                     buildCellValue(cell, convertResult, propertyList.get(j));
                     calculateColumWidth(cell, j);
                 }
+                if (nullCellCount == propertyList.size()) {
+                    log.warn("忽略一行空数据!");
+                    sheet.removeRow(row);
+                    rowNum--;
+                }
+                nullCellCount = 0;
+
             }
             if (data.size() < pageSize) {
                 sizeColumWidth(sheet, propertyList.size());
@@ -200,6 +209,12 @@ public class ExcelWriter {
                     buildCellValue(cell, convertResult, propertyList.get(j));
                     calculateColumWidth(cell, j);
                 }
+                if (nullCellCount == propertyList.size()) {
+                    log.warn("忽略一行空数据!");
+                    sheet.removeRow(bodyRow);
+                    rowNum--;
+                }
+                nullCellCount = 0;
             }
             if (data.size() < pageSize) {
                 sizeColumWidth(sheet, propertyList.size());
@@ -278,7 +293,9 @@ public class ExcelWriter {
     private void buildCellValue(SXSSFCell cell, Object entity, ExcelPropertyEntity property) throws Exception {
         Field field = property.getFieldEntity();
         Object cellValue = field.get(entity);
-
+        if (StringUtil.isBlank(cellValue) || "0".equals(cellValue.toString())|| "0.0".equals(cellValue.toString())|| "0.00".equals(cellValue.toString())) {
+            nullCellCount++;
+        }
         if (cellValue == null) {
             cell.setCellValue("");
         } else if (cellValue instanceof BigDecimal) {

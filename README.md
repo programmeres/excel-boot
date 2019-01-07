@@ -2,11 +2,11 @@
 
 Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
 
-**如果喜欢或愿意使用, 请star并且Watch本项目**
+**如果喜欢或愿意使用, 请star并且Watch本项目或者移步码云捐赠我们  https://gitee.com/nw1992/easy-poi**
 
-**如果是企业使用, 请通过修改本文件的企业列表告诉我企业名称(用途：1.知晓有用户正在使用本项目、2.鼓励我们继续维护本项目).**
+**如果是企业使用, 请通过修改本文件的企业列表告诉我企业名称(用途：让我们知道有用户正在使用我们的产品,我们就很满足了).**
 
-发现解决bug并已自测,pullRequest后,可以通过邮件告知我们（magic_app@126.com）, 第一时间合并并且发布最新版本
+有问题可以通过邮件告知我们（magic_app@126.com）, 尽力第一时间解决您的问题
 ## 使用企业列表：
 
 ## 功能简介
@@ -47,6 +47,8 @@ Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
 8.注解中的用户自定义字符串信息以及Excel信息已全部trim,不用担心存在前后空格的风险
 
 9.Excel样式简洁、大方、美观
+
+10.导出的单条数据假如全部属性都为null或0或0.0或0.00或空字符串者null字符串,自动忽略,此特性也可让用户自定义忽略规则
 
 ## 组件需知
 导入和导出只支持尾缀为xlsx的Excel文件、标注注解的属性顺序即Excel列的排列顺序、时间转化格式(dateFormat)默认为“yyyy-MM-dd HH:mm:ss“.
@@ -89,7 +91,7 @@ Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
     public static final int DEFAULT_RECORD_COUNT_PEER_SHEET = 80000;
 ```
 ## 版本
-当前为2.0.0版本,新版本正在开发
+当前为2.0版本,新版本正在开发
 
 ## 使用手册
 1.引入Maven依赖
@@ -104,7 +106,7 @@ Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
 <dependency>
 	<groupId>io.github.magic-core</groupId>
 	<artifactId>easy-poi</artifactId>
-	<version>2.0.0</version>
+	<version>2.0</version>
 </dependency>
 ```
 ### @ExportField
