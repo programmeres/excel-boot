@@ -1,5 +1,7 @@
 # Easy-POI
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6847cc8aa4154bee892b250a9bc846c9)](https://app.codacy.com/app/programmeres/easy-poi?utm_source=github.com&utm_medium=referral&utm_content=programmeres/easy-poi&utm_campaign=Badge_Grade_Dashboard)
+
 Easy-POI是一款Excel导入导出解决方案组成的轻量级开源组件。
 
 **如果喜欢或愿意使用, 请star并且Watch本项目或者移步码云捐赠我们  https://gitee.com/nw1992/easy-poi**
