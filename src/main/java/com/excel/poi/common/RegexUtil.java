@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  */
 public class RegexUtil {
 
-    private final static LoadingCache<String, Pattern> loadCache =
+    private final static LoadingCache<String, Pattern> LOAD_CACHE =
             CacheBuilder.newBuilder()
                     .maximumSize(30)
                     .build(new CacheLoader<String, Pattern>() {
@@ -38,6 +38,6 @@ public class RegexUtil {
                     });
 
     public static Boolean isMatch(String pattern, String value) throws ExecutionException {
-        return loadCache.get(pattern).matcher(value).matches();
+        return LOAD_CACHE.get(pattern).matcher(value).matches();
     }
 }

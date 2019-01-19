@@ -20,11 +20,17 @@ package com.excel.poi.common;
  * @author NingWei
  */
 public final class Constant {
-    //Excel自动刷新到磁盘的数量
+    /**
+     * Excel自动刷新到磁盘的数量
+     */
     public static final int DEFAULT_ROW_ACCESS_WINDOW_SIZE = 2000;
-    //分页条数
+    /**
+     * 分页条数
+     */
     public static final int DEFAULT_PAGE_SIZE = 3000;
-    //分Sheet条数
+    /**
+     * 分Sheet条数
+     */
     public static final int DEFAULT_RECORD_COUNT_PEER_SHEET = 80000;
 
     public static final String CELL = "c";

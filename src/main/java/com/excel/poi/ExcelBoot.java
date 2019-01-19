@@ -20,7 +20,7 @@ import com.excel.poi.common.Constant;
 import com.excel.poi.entity.ExcelEntity;
 import com.excel.poi.excel.ExcelReader;
 import com.excel.poi.excel.ExcelWriter;
-import com.excel.poi.exception.EasyPOIException;
+import com.excel.poi.exception.ExcelBootException;
 import com.excel.poi.factory.ExcelMappingFactory;
 import com.excel.poi.function.ExportFunction;
 import com.excel.poi.function.ImportFunction;
@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
  * @author NingWei
  */
 @Slf4j
-public class EasyPoi {
+public class ExcelBoot {
     private HttpServletResponse httpServletResponse;
     private OutputStream outputStream;
     private InputStream inputStream;
@@ -54,7 +54,7 @@ public class EasyPoi {
      * @param inputStream
      * @param excelClass
      */
-    protected EasyPoi(InputStream inputStream, Class excelClass) {
+    protected ExcelBoot(InputStream inputStream, Class excelClass) {
         this(null, null, inputStream, null, excelClass, null, null, null);
     }
 
@@ -65,7 +65,7 @@ public class EasyPoi {
      * @param fileName
      * @param excelClass
      */
-    protected EasyPoi(OutputStream outputStream, String fileName, Class excelClass) {
+    protected ExcelBoot(OutputStream outputStream, String fileName, Class excelClass) {
         this(null, outputStream, null, fileName, excelClass, Constant.DEFAULT_PAGE_SIZE, Constant.DEFAULT_ROW_ACCESS_WINDOW_SIZE, Constant.DEFAULT_RECORD_COUNT_PEER_SHEET);
     }
 
@@ -76,7 +76,7 @@ public class EasyPoi {
      * @param fileName
      * @param excelClass
      */
-    protected EasyPoi(HttpServletResponse response, String fileName, Class excelClass) {
+    protected ExcelBoot(HttpServletResponse response, String fileName, Class excelClass) {
         this(response, null, null, fileName, excelClass, Constant.DEFAULT_PAGE_SIZE, Constant.DEFAULT_ROW_ACCESS_WINDOW_SIZE, Constant.DEFAULT_RECORD_COUNT_PEER_SHEET);
     }
 
@@ -92,7 +92,7 @@ public class EasyPoi {
      * @param rowAccessWindowSize
      * @param recordCountPerSheet
      */
-    protected EasyPoi(HttpServletResponse response, OutputStream outputStream, InputStream inputStream
+    protected ExcelBoot(HttpServletResponse response, OutputStream outputStream, InputStream inputStream
             , String fileName, Class excelClass, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet) {
         this.httpServletResponse = response;
         this.outputStream = outputStream;
@@ -112,8 +112,8 @@ public class EasyPoi {
      * @param clazz
      * @return
      */
-    public static EasyPoi ExportBuilder(HttpServletResponse httpServletResponse, String fileName, Class clazz) {
-        return new EasyPoi(httpServletResponse, fileName, clazz);
+    public static ExcelBoot ExportBuilder(HttpServletResponse httpServletResponse, String fileName, Class clazz) {
+        return new ExcelBoot(httpServletResponse, fileName, clazz);
     }
 
     /**
@@ -124,8 +124,8 @@ public class EasyPoi {
      * @param clazz
      * @return
      */
-    public static EasyPoi ExportBuilder(OutputStream outputStream, String fileName, Class clazz) {
-        return new EasyPoi(outputStream, fileName, clazz);
+    public static ExcelBoot ExportBuilder(OutputStream outputStream, String fileName, Class clazz) {
+        return new ExcelBoot(outputStream, fileName, clazz);
     }
 
     /**
@@ -135,8 +135,8 @@ public class EasyPoi {
      * @param clazz
      * @return
      */
-    public static EasyPoi ImportBuilder(InputStream inputStreamm, Class clazz) {
-        return new EasyPoi(inputStreamm, clazz);
+    public static ExcelBoot ImportBuilder(InputStream inputStreamm, Class clazz) {
+        return new ExcelBoot(inputStreamm, clazz);
     }
 
     /**
@@ -149,43 +149,22 @@ public class EasyPoi {
      * @param <T>
      */
     public <R, T> void exportResponse(R param, ExportFunction<R, T> exportFunction) {
+        SXSSFWorkbook sxssfWorkbook = null;
         try {
-            if (httpServletResponse == null) {
-                throw new EasyPOIException("httpServletResponse参数为空!");
+            try {
+                verifyResponse();
+                sxssfWorkbook = commonSingleSheet(param, exportFunction);
+                download(sxssfWorkbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
+            } finally {
+                if (sxssfWorkbook != null) {
+                    sxssfWorkbook.close();
+                }
+                if (httpServletResponse.getOutputStream() != null) {
+                    httpServletResponse.getOutputStream().close();
+                }
             }
-            VerifyParams();
-            ExcelEntity excelEntity = ExcelMappingFactory.loadExportExcelClass(excelClass);
-            excelEntity.setFileName(fileName);
-            ExcelWriter excelWriter = new ExcelWriter(excelEntity, pageSize, rowAccessWindowSize, recordCountPerSheet);
-            SXSSFWorkbook workbook = excelWriter.generateWorkbook(param, exportFunction);
-            download(workbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
         } catch (Exception e) {
-            throw new EasyPOIException(e);
-        }
-    }
-
-    /**
-     * 用于浏览器分sheet导出
-     *
-     * @param param
-     * @param exportFunction
-     * @param ExportFunction
-     * @param <R>
-     * @param <T>
-     */
-    public <R, T> void exportMultiSheetResponse(R param, ExportFunction<R, T> exportFunction) {
-        try {
-            if (httpServletResponse == null) {
-                throw new EasyPOIException("httpServletResponse参数为空!");
-            }
-            VerifyParams();
-            ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass);
-            excelMapping.setFileName(fileName);
-            ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
-            SXSSFWorkbook workbook = excelWriter.generateMultiSheetWorkbook(param, exportFunction);
-            download(workbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
-        } catch (Exception e) {
-            throw new EasyPOIException(e);
+            throw new ExcelBootException(e);
         }
     }
 
@@ -199,10 +178,18 @@ public class EasyPoi {
      * @param <T>
      */
     public <R, T> void exportStream(R param, ExportFunction<R, T> exportFunction) {
+        OutputStream outputStream = null;
         try {
-            write(generateExcelStream(param, exportFunction));
+            try {
+                outputStream = generateStream(param, exportFunction);
+                write(outputStream);
+            } finally {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            }
         } catch (Exception e) {
-            throw new EasyPOIException(e);
+            throw new ExcelBootException(e);
         }
     }
 
@@ -216,22 +203,48 @@ public class EasyPoi {
      * @param <T>
      * @return
      */
-    public <R, T> OutputStream generateExcelStream(R param, ExportFunction<R, T> exportFunction) {
+    public <R, T> OutputStream generateStream(R param, ExportFunction<R, T> exportFunction) throws IOException {
+        SXSSFWorkbook sxssfWorkbook = null;
         try {
-            if (outputStream == null) {
-                throw new EasyPOIException("outputStream参数为空!");
-            }
-            VerifyParams();
-            ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass);
-            excelMapping.setFileName(fileName);
-            ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
-            SXSSFWorkbook workbook = excelWriter.generateWorkbook(param, exportFunction);
-            workbook.write(outputStream);
+            verifyStream();
+            sxssfWorkbook = commonSingleSheet(param, exportFunction);
+            sxssfWorkbook.write(outputStream);
             return outputStream;
         } catch (Exception e) {
-            throw new EasyPOIException(e);
+            log.error("生成Excel发生异常! 异常信息:", e);
+            if (sxssfWorkbook != null) {
+                sxssfWorkbook.close();
+            }
+            throw new ExcelBootException(e);
         }
     }
+
+    /**
+     * 用于浏览器分sheet导出
+     *
+     * @param param
+     * @param exportFunction
+     * @param ExportFunction
+     * @param <R>
+     * @param <T>
+     */
+    public <R, T> void exportMultiSheetResponse(R param, ExportFunction<R, T> exportFunction) {
+        SXSSFWorkbook sxssfWorkbook = null;
+        try {
+            try {
+                verifyResponse();
+                sxssfWorkbook = commonMultiSheet(param, exportFunction);
+                download(sxssfWorkbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
+            } finally {
+                if (sxssfWorkbook != null) {
+                    sxssfWorkbook.close();
+                }
+            }
+        } catch (Exception e) {
+            throw new ExcelBootException(e);
+        }
+    }
+
 
     /**
      * 通过OutputStream分sheet导出excel文件,一般用于异步导出大Excel文件到本地路径
@@ -243,10 +256,18 @@ public class EasyPoi {
      * @param <T>
      */
     public <R, T> void exportMultiSheetStream(R param, ExportFunction<R, T> exportFunction) {
+        OutputStream outputStream = null;
         try {
-            write(generateMultiSheetExcelStream(param, exportFunction));
+            try {
+                outputStream = generateMultiSheetStream(param, exportFunction);
+                write(outputStream);
+            } finally {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            }
         } catch (Exception e) {
-            throw new EasyPOIException(e);
+            throw new ExcelBootException(e);
         }
     }
 
@@ -261,20 +282,19 @@ public class EasyPoi {
      * @param <T>
      * @return
      */
-    public <R, T> OutputStream generateMultiSheetExcelStream(R param, ExportFunction<R, T> exportFunction) {
+    public <R, T> OutputStream generateMultiSheetStream(R param, ExportFunction<R, T> exportFunction) throws IOException {
+        SXSSFWorkbook sxssfWorkbook = null;
         try {
-            if (outputStream == null) {
-                throw new EasyPOIException("outputStream参数为空!");
-            }
-            VerifyParams();
-            ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass);
-            excelMapping.setFileName(fileName);
-            ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
-            SXSSFWorkbook workbook = excelWriter.generateMultiSheetWorkbook(param, exportFunction);
-            workbook.write(outputStream);
+            verifyStream();
+            sxssfWorkbook = commonMultiSheet(param, exportFunction);
+            sxssfWorkbook.write(outputStream);
             return outputStream;
         } catch (Exception e) {
-            throw new EasyPOIException(e);
+            log.error("分Sheet生成Excel发生异常! 异常信息:", e);
+            if (sxssfWorkbook != null) {
+                sxssfWorkbook.close();
+            }
+            throw new ExcelBootException(e);
         }
     }
 
@@ -285,18 +305,25 @@ public class EasyPoi {
      * @throws Exception
      */
     public void exportTemplate() {
+        SXSSFWorkbook sxssfWorkbook = null;
         try {
-            if (httpServletResponse == null) {
-                throw new EasyPOIException("httpServletResponse参数为空!");
+            try {
+                verifyResponse();
+                verifyParams();
+                ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass, fileName);
+                ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
+                sxssfWorkbook = excelWriter.generateTemplateWorkbook();
+                download(sxssfWorkbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
+            } finally {
+                if (sxssfWorkbook != null) {
+                    sxssfWorkbook.close();
+                }
+                if (httpServletResponse.getOutputStream() != null) {
+                    httpServletResponse.getOutputStream().close();
+                }
             }
-            VerifyParams();
-            ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass);
-            excelMapping.setFileName(fileName);
-            ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
-            SXSSFWorkbook workbook = excelWriter.generateTemplateWorkbook();
-            download(workbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
         } catch (Exception e) {
-            throw new EasyPOIException(e);
+            throw new ExcelBootException(e);
         }
     }
 
@@ -312,19 +339,33 @@ public class EasyPoi {
     public void importExcel(ImportFunction importFunction) {
         try {
             if (importFunction == null) {
-                throw new EasyPOIException("excelReadHandler参数为空!");
+                throw new ExcelBootException("excelReadHandler参数为空!");
             }
             if (inputStream == null) {
-                throw new EasyPOIException("inputStream参数为空!");
+                throw new ExcelBootException("inputStream参数为空!");
             }
 
             ExcelEntity excelMapping = ExcelMappingFactory.loadImportExcelClass(excelClass);
             ExcelReader excelReader = new ExcelReader(excelClass, excelMapping, importFunction);
             excelReader.process(inputStream);
         } catch (Exception e) {
-            throw new EasyPOIException(e);
+            throw new ExcelBootException(e);
         }
 
+    }
+
+    private <R, T> SXSSFWorkbook commonSingleSheet(R param, ExportFunction<R, T> exportFunction) throws Exception {
+        verifyParams();
+        ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass, fileName);
+        ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
+        return excelWriter.generateWorkbook(param, exportFunction);
+    }
+
+    private <R, T> SXSSFWorkbook commonMultiSheet(R param, ExportFunction<R, T> exportFunction) throws Exception {
+        verifyParams();
+        ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass, fileName);
+        ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
+        return excelWriter.generateMultiSheetWorkbook(param, exportFunction);
     }
 
     /**
@@ -335,29 +376,7 @@ public class EasyPoi {
      */
     private void write(OutputStream out) throws IOException {
         if (null != out) {
-            try {
-                out.flush();
-            } finally {
-                out.close();
-            }
-        }
-    }
-
-    /**
-     * 生成文件
-     *
-     * @param wb
-     * @param out
-     * @throws IOException
-     */
-    private void write(SXSSFWorkbook wb, OutputStream out) throws IOException {
-        if (null != out) {
-            try {
-                wb.write(out);
-                out.flush();
-            } finally {
-                out.close();
-            }
+            out.flush();
         }
     }
 
@@ -375,15 +394,30 @@ public class EasyPoi {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-disposition",
                 String.format("attachment; filename=%s", filename));
-        write(wb, out);
+        if (null != out) {
+            wb.write(out);
+            out.flush();
+        }
     }
 
-    private void VerifyParams() {
+    private void verifyResponse() {
+        if (httpServletResponse == null) {
+            throw new ExcelBootException("httpServletResponse参数为空!");
+        }
+    }
+
+    private void verifyStream() {
+        if (outputStream == null) {
+            throw new ExcelBootException("outputStream参数为空!");
+        }
+    }
+
+    private void verifyParams() {
         if (excelClass == null) {
-            throw new EasyPOIException("excelClass参数为空!");
+            throw new ExcelBootException("excelClass参数为空!");
         }
         if (fileName == null) {
-            throw new EasyPOIException("fileName参数为空!");
+            throw new ExcelBootException("fileName参数为空!");
         }
     }
 

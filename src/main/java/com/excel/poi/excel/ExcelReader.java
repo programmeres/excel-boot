@@ -25,7 +25,7 @@ import com.excel.poi.entity.ErrorEntity;
 import com.excel.poi.entity.ExcelEntity;
 import com.excel.poi.entity.ExcelPropertyEntity;
 import com.excel.poi.exception.AllEmptyRowException;
-import com.excel.poi.exception.EasyPOIException;
+import com.excel.poi.exception.ExcelBootException;
 import com.excel.poi.function.ImportFunction;
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,7 +113,7 @@ public class ExcelReader extends DefaultHandler {
                     } catch (AllEmptyRowException e) {
                         log.warn(e.getMessage());
                     } catch (Exception e) {
-                        throw new EasyPOIException(e, "第{}个Sheet,第{}行,第{}列,系统发生异常! ", currentSheetIndex + 1, currentRowIndex + 1, dataCurrentCellIndex + 1);
+                        throw new ExcelBootException(e, "第{}个Sheet,第{}行,第{}列,系统发生异常! ", currentSheetIndex + 1, currentRowIndex + 1, dataCurrentCellIndex + 1);
                     }
                 } finally {
                     if (sheet != null) {
@@ -154,11 +154,11 @@ public class ExcelReader extends DefaultHandler {
     public void startElement(String uri, String localName, String name, Attributes attributes) {
         if (Constant.CELL.equals(name)) {
             //获得当前坐标,即A1、B1
-            String xyz_location = attributes.getValue(Constant.XYZ_LOCATION);
+            String xyzLocation = attributes.getValue(Constant.XYZ_LOCATION);
             // 前一个单元格的坐标
-            previousCellLocation = null == previousCellLocation ? xyz_location : currentCellLocation;
+            previousCellLocation = null == previousCellLocation ? xyzLocation : currentCellLocation;
             // 当前单元格的坐标
-            currentCellLocation = xyz_location;
+            currentCellLocation = xyzLocation;
             String cellType = attributes.getValue(Constant.CELL_T_PROPERTY);
             //String cellStyleStr = attributes.getValue(Constant.CELL_S_property);
             //<c r="A1" t="s"><v>0</v>
@@ -221,7 +221,7 @@ public class ExcelReader extends DefaultHandler {
                 endCellLocation = currentCellLocation;
                 int propertySize = excelMapping.getPropertyList().size();
                 if (cellsOnRow.size() != propertySize) {
-                    throw new EasyPOIException("Excel有效列数不等于标注注解的属性数量!Excel列数:{},标注注解的属性数量:{}", cellsOnRow.size(), propertySize);
+                    throw new ExcelBootException("Excel有效列数不等于标注注解的属性数量!Excel列数:{},标注注解的属性数量:{}", cellsOnRow.size(), propertySize);
                 }
             }
             //补全一行尾部可能缺失的单元格
@@ -236,7 +236,7 @@ public class ExcelReader extends DefaultHandler {
             } catch (AllEmptyRowException e) {
                 throw e;
             } catch (Exception e) {
-                throw new EasyPOIException(e);
+                throw new ExcelBootException(e);
             }
             cellsOnRow.clear();
             currentRowIndex++;
@@ -261,7 +261,7 @@ public class ExcelReader extends DefaultHandler {
         } else if ("s".equals(cellType) || cellType == null) {
             cellFormatStr = ExcelCellType.STRING;
         } else {
-            throw new EasyPOIException("Excel单元格格式未设置成文本或者常规!单元格格式:{}", cellType);
+            throw new ExcelBootException("Excel单元格格式未设置成文本或者常规!单元格格式:{}", cellType);
         }
     }
 
@@ -345,9 +345,13 @@ public class ExcelReader extends DefaultHandler {
         } else if (filedClazz == Float.class || filedClazz == float.class) {
             cellValue = Float.valueOf(convertNullTOZERO(cellValue));
         } else if (filedClazz == BigDecimal.class) {
-            cellValue = new BigDecimal(convertNullTOZERO(cellValue)).setScale(mappingProperty.getScale(), mappingProperty.getRoundingMode());
+            if (mappingProperty.getScale() == -1) {
+                cellValue = new BigDecimal(convertNullTOZERO(cellValue));
+            } else {
+                cellValue = new BigDecimal(convertNullTOZERO(cellValue)).setScale(mappingProperty.getScale(), mappingProperty.getRoundingMode());
+            }
         } else if (filedClazz != String.class) {
-            throw new EasyPOIException("不支持的属性类型:{},导入失败!", filedClazz);
+            throw new ExcelBootException("不支持的属性类型:{},导入失败!", filedClazz);
         }
 
         return cellValue;
@@ -361,7 +365,7 @@ public class ExcelReader extends DefaultHandler {
             if (null == cellValue || StringUtil.isBlank(cellValue)) {
                 String validErrorMessage = String.format("第[%s]个Sheet,第[%s]行,第[%s]列必填单元格为空!"
                         , currentSheetIndex + 1, currentRowIndex + 1, cellIndex + 1);
-                return buildErrorMsg(cellIndex, cellValue, mappingProperty, validErrorMessage);
+                return buildErrorMsg(cellIndex, cellValue, validErrorMessage);
             }
         }
 
@@ -373,19 +377,19 @@ public class ExcelReader extends DefaultHandler {
                 String regularExpMessage = mappingProperty.getRegexMessage();
                 String validErrorMessage = String.format("第[%s]个Sheet,第[%s]行,第[%s]列,单元格值:[%s],正则表达式[%s]校验失败!"
                         , currentSheetIndex + 1, currentRowIndex + 1, cellIndex + 1, cellValue, regularExpMessage);
-                return buildErrorMsg(cellIndex, cellValue, mappingProperty, validErrorMessage);
+                return buildErrorMsg(cellIndex, cellValue, validErrorMessage);
             }
         }
 
-        return buildErrorMsg(cellIndex, cellValue, mappingProperty, null);
+        return buildErrorMsg(cellIndex, cellValue, null);
     }
 
-    private ErrorEntity buildErrorMsg(Integer cellIndex, Object cellValue, ExcelPropertyEntity excelPropertyEntity,
+    private ErrorEntity buildErrorMsg(Integer cellIndex, Object cellValue,
                                       String validErrorMessage) {
         return ErrorEntity.builder()
                 .sheetIndex(currentSheetIndex + 1)
                 .rowIndex(currentRowIndex + 1)
-                .cellIndex(cellIndex + 1)//
+                .cellIndex(cellIndex + 1)
                 .cellValue(StringUtil.convertNull(cellValue))
                 .errorMessage(validErrorMessage)
                 .build();
@@ -394,36 +398,36 @@ public class ExcelReader extends DefaultHandler {
     /**
      * 计算两个单元格之间的单元格数目(同一行)
      *
-     * @param ref
-     * @param ref2
+     * @param refA
+     * @param refB
      * @return
      */
-    public int countNullCell(String ref, String ref2) {
+    public int countNullCell(String refA, String refB) {
         // excel2007最大行数是1048576，最大列数是16384，最后一列列名是XFD
-        String xfd = ref.replaceAll("\\d+", "");
-        String xfd_1 = ref2.replaceAll("\\d+", "");
+        String xfdA = refA.replaceAll("\\d+", "");
+        String xfdB = refB.replaceAll("\\d+", "");
 
-        xfd = fillChar(xfd, 3, '@', true);
-        xfd_1 = fillChar(xfd_1, 3, '@', true);
+        xfdA = fillChar(xfdA, 3, '@', true);
+        xfdB = fillChar(xfdB, 3, '@', true);
 
-        char[] letter = xfd.toCharArray();
-        char[] letter_1 = xfd_1.toCharArray();
-        int res = (letter[0] - letter_1[0]) * 26 * 26 + (letter[1] - letter_1[1]) * 26 + (letter[2] - letter_1[2]);
+        char[] letterA = xfdA.toCharArray();
+        char[] letterB = xfdB.toCharArray();
+        int res = (letterA[0] - letterB[0]) * 26 * 26 + (letterA[1] - letterB[1]) * 26 + (letterA[2] - letterB[2]);
         return res - 1;
     }
 
     private String fillChar(String str, int len, char let, boolean isPre) {
-        int len_1 = str.length();
-        if (len_1 < len) {
+        int lenA = str.length();
+        if (lenA < len) {
             if (isPre) {
                 StringBuilder strBuilder = new StringBuilder(str);
-                for (int i = 0; i < (len - len_1); i++) {
+                for (int i = 0; i < (len - lenA); i++) {
                     strBuilder.insert(0, let);
                 }
                 str = strBuilder.toString();
             } else {
                 StringBuilder strBuilder = new StringBuilder(str);
-                for (int i = 0; i < (len - len_1); i++) {
+                for (int i = 0; i < (len - lenA); i++) {
                     strBuilder.append(let);
                 }
                 str = strBuilder.toString();

@@ -67,11 +67,11 @@ public class ExcelWriter {
     private Map<Integer, Integer> columnWidthMap = new HashMap<Integer, Integer>();
 
 
-    public ExcelWriter(ExcelEntity excelEntity, Integer pageSize, Integer rowAccessWindowSize, Integer RecordCountPerSheet) {
+    public ExcelWriter(ExcelEntity excelEntity, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet) {
         this.excelEntity = excelEntity;
         this.pageSize = pageSize;
         this.rowAccessWindowSize = rowAccessWindowSize;
-        this.recordCountPerSheet = RecordCountPerSheet;
+        this.recordCountPerSheet = recordCountPerSheet;
     }
 
     /**
@@ -293,7 +293,7 @@ public class ExcelWriter {
     private void buildCellValue(SXSSFCell cell, Object entity, ExcelPropertyEntity property) throws Exception {
         Field field = property.getFieldEntity();
         Object cellValue = field.get(entity);
-        if (StringUtil.isBlank(cellValue) || "0".equals(cellValue.toString())|| "0.0".equals(cellValue.toString())|| "0.00".equals(cellValue.toString())) {
+        if (StringUtil.isBlank(cellValue) || "0".equals(cellValue.toString()) || "0.0".equals(cellValue.toString()) || "0.00".equals(cellValue.toString())) {
             nullCellCount++;
         }
         if (cellValue == null) {
@@ -321,8 +321,8 @@ public class ExcelWriter {
             headCellStyle.setBorderBottom(BorderStyle.NONE);
             headCellStyle.setBorderLeft(BorderStyle.NONE);
             //上下左右居中
-            headCellStyle.setAlignment(HorizontalAlignment.CENTER);// 居中
-            headCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);// 居中
+            headCellStyle.setAlignment(HorizontalAlignment.CENTER);
+            headCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             //填充色-灰色 实线
             XSSFColor color = new XSSFColor(new java.awt.Color(217, 217, 217));
             headCellStyle.setFillForegroundColor(color);
