@@ -255,7 +255,7 @@ public class ExcelWriter {
         if (openAutoColumWidth) {
             String cellValue = cell.getStringCellValue();
             int length = cellValue.getBytes().length;
-            length += (int)Math.ceil((double)((cellValue.length() * 3 - length) / 2) * 0.1D);
+            length += (int) Math.ceil((double) ((cellValue.length() * 3 - length) / 2) * 0.1D);
             length = Math.max(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MIN);
             length = Math.min(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MAX);
             if (columnWidthMap.get(columnIndex) == null || columnWidthMap.get(columnIndex) < length) {
