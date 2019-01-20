@@ -65,13 +65,14 @@ public class ExcelWriter {
     private Integer recordCountPerSheet;
     private XSSFCellStyle headCellStyle;
     private Map<Integer, Integer> columnWidthMap = new HashMap<Integer, Integer>();
+    private Boolean openAutoColumWidth;
 
-
-    public ExcelWriter(ExcelEntity excelEntity, Integer pageSize, Integer rowAccessWindowSize, Integer RecordCountPerSheet) {
+    public ExcelWriter(ExcelEntity excelEntity, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth) {
         this.excelEntity = excelEntity;
         this.pageSize = pageSize;
         this.rowAccessWindowSize = rowAccessWindowSize;
-        this.recordCountPerSheet = RecordCountPerSheet;
+        this.recordCountPerSheet = recordCountPerSheet;
+        this.openAutoColumWidth = openAutoColumWidth;
     }
 
     /**
@@ -234,9 +235,11 @@ public class ExcelWriter {
      * @param columnIndex
      */
     private void sizeColumWidth(SXSSFSheet sheet, Integer columnSize) {
-        for (int j = 0; j < columnSize; j++) {
-            if (columnWidthMap.get(j) != null) {
-                sheet.setColumnWidth(j, columnWidthMap.get(j) * 256);
+        if (openAutoColumWidth) {
+            for (int j = 0; j < columnSize; j++) {
+                if (columnWidthMap.get(j) != null) {
+                    sheet.setColumnWidth(j, columnWidthMap.get(j) * 256);
+                }
             }
         }
     }
@@ -249,11 +252,15 @@ public class ExcelWriter {
      * @param columnIndex
      */
     private void calculateColumWidth(SXSSFCell cell, Integer columnIndex) {
-        int length = cell.getStringCellValue().getBytes().length;
-        length = Math.max(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MIN);
-        length = Math.min(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MAX);
-        if (columnWidthMap.get(columnIndex) == null || columnWidthMap.get(columnIndex) < length) {
-            columnWidthMap.put(columnIndex, length);
+        if (openAutoColumWidth) {
+            String cellValue = cell.getStringCellValue();
+            int length = cellValue.getBytes().length;
+            length += (int) Math.ceil((double) ((cellValue.length() * 3 - length) / 2) * 0.1D);
+            length = Math.max(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MIN);
+            length = Math.min(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MAX);
+            if (columnWidthMap.get(columnIndex) == null || columnWidthMap.get(columnIndex) < length) {
+                columnWidthMap.put(columnIndex, length);
+            }
         }
     }
 
@@ -289,7 +296,7 @@ public class ExcelWriter {
     private void buildCellValue(SXSSFCell cell, Object entity, ExcelPropertyEntity property) throws Exception {
         Field field = property.getFieldEntity();
         Object cellValue = field.get(entity);
-        if (StringUtil.isBlank(cellValue) || "0".equals(cellValue.toString())|| "0.0".equals(cellValue.toString())|| "0.00".equals(cellValue.toString())) {
+        if (StringUtil.isBlank(cellValue) || "0".equals(cellValue.toString()) || "0.0".equals(cellValue.toString()) || "0.00".equals(cellValue.toString())) {
             nullCellCount++;
         }
         if (cellValue == null) {
@@ -315,8 +322,8 @@ public class ExcelWriter {
             headCellStyle.setBorderRight(BorderStyle.NONE);
             headCellStyle.setBorderBottom(BorderStyle.NONE);
             headCellStyle.setBorderLeft(BorderStyle.NONE);
-            headCellStyle.setAlignment(HorizontalAlignment.CENTER);// 居中
-            headCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);// 居中
+            headCellStyle.setAlignment(HorizontalAlignment.CENTER);
+            headCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
             XSSFColor color = new XSSFColor(new java.awt.Color(217, 217, 217));
             headCellStyle.setFillForegroundColor(color);
             headCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);

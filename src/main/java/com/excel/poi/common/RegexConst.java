@@ -20,13 +20,21 @@ package com.excel.poi.common;
  * @author NingWei
  */
 public class RegexConst {
-    //金额校验:支持正负,整数位不大于12位,小数位不大于2位,也可以没有小数位
+    /**
+     * 金额校验:支持正负,整数位不大于12位,小数位不大于2位,也可以没有小数位
+     */
     public static final String AMOUNT_REGEX = "((-|\\+?)\\d{1,12}|(-|\\+?)\\d{1,12}\\.\\d{1,2})";
-    //手机号验证:共11位,1开头
+    /**
+     * 手机号验证:共11位,1开头
+     */
     public static final String PHONE_REGEX = "^(1)\\d{10}$";
-    //邮箱验证
+    /**
+     * 邮箱验证
+     */
     public static final String MAIL_REGEX = "^[\\w-]+(\\.[\\w-]+)*@[\\w-]+(\\.[\\w-]+)+$";
-    //身份证校验
+    /**
+     * 身份证校验
+     */
     public static final String IDCARD_REGEX = "(^[1-9]\\d{9}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$)|" +
             "(^[1-9]\\d{9}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}$)";
     //^开头

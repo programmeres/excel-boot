@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class DateFormatUtil {
 
-    private final static LoadingCache<String, SimpleDateFormat> loadCache =
+    private final static LoadingCache<String, SimpleDateFormat> LOAD_CACHE =
             CacheBuilder.newBuilder()
                     .maximumSize(5)
                     .build(new CacheLoader<String, SimpleDateFormat>() {
@@ -40,10 +40,10 @@ public class DateFormatUtil {
                     });
 
     public static Date parse(String pattern, String value) throws ExecutionException, ParseException {
-        return loadCache.get(pattern).parse(value);
+        return LOAD_CACHE.get(pattern).parse(value);
     }
 
     public static String format(String pattern, Date value) throws ExecutionException {
-        return loadCache.get(pattern).format(value);
+        return LOAD_CACHE.get(pattern).format(value);
     }
 }

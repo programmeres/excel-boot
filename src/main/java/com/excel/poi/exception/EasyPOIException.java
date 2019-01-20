@@ -21,22 +21,22 @@ import org.slf4j.helpers.MessageFormatter;
 /**
  * @author NingWei
  */
-public class EasyPOIException extends RuntimeException {
+public class ExcelBootException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public EasyPOIException(String msg) {
+    public ExcelBootException(String msg) {
         super(msg);
     }
 
-    public EasyPOIException(String format, Object... arguments) {
+    public ExcelBootException(String format, Object... arguments) {
         super(MessageFormatter.arrayFormat(format, arguments).getMessage());
     }
 
-    public EasyPOIException(Throwable cause, String format, Object... arguments) {
+    public ExcelBootException(Throwable cause, String format, Object... arguments) {
         super(MessageFormatter.arrayFormat(format, arguments).getMessage(), cause);
     }
 
-    public EasyPOIException(Throwable cause) {
+    public ExcelBootException(Throwable cause) {
         super(cause);
     }
 }

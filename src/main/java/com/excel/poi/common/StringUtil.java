@@ -27,7 +27,7 @@ public class StringUtil {
      * @return
      */
     public static boolean isBlank(Object str) {
-        return str == null || str.toString().trim().equals("") || "null".equalsIgnoreCase(str.toString().trim());
+        return str == null || "".equals(str.toString().trim()) || "null".equalsIgnoreCase(str.toString().trim());
     }
 
     /**
@@ -50,7 +50,7 @@ public class StringUtil {
      * @return
      */
     public static String convertNullTOZERO(Object str) {
-        if (str == null || str.toString().trim().equals("") || "null".equalsIgnoreCase(str.toString().trim())) {
+        if (str == null || "".equals(str.toString().trim()) || "null".equalsIgnoreCase(str.toString().trim())) {
             return "0";
         }
         return str.toString();
@@ -62,7 +62,7 @@ public class StringUtil {
         } else {
             int sz = cs.length();
 
-            for(int i = 0; i < sz; ++i) {
+            for (int i = 0; i < sz; ++i) {
                 if (!Character.isDigit(cs.charAt(i))) {
                     return false;
                 }

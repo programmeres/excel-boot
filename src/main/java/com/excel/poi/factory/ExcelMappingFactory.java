@@ -20,7 +20,7 @@ import com.excel.poi.annotation.ExportField;
 import com.excel.poi.annotation.ImportField;
 import com.excel.poi.entity.ExcelEntity;
 import com.excel.poi.entity.ExcelPropertyEntity;
-import com.excel.poi.exception.EasyPOIException;
+import com.excel.poi.exception.ExcelBootException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class ExcelMappingFactory {
             }
         }
         if (propertyList.isEmpty()) {
-            throw new EasyPOIException("[{}] 类未找到标注@ImportField注解的属性!", clazz.getName());
+            throw new ExcelBootException("[{}] 类未找到标注@ImportField注解的属性!", clazz.getName());
         }
         ExcelEntity excelMapping = new ExcelEntity();
         excelMapping.setPropertyList(propertyList);
@@ -75,7 +75,7 @@ public class ExcelMappingFactory {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public static ExcelEntity loadExportExcelClass(Class<?> clazz) {
+    public static ExcelEntity loadExportExcelClass(Class<?> clazz, String fileName) {
         List<ExcelPropertyEntity> propertyList = new ArrayList<ExcelPropertyEntity>();
 
         Field[] fields = clazz.getDeclaredFields();
@@ -95,10 +95,11 @@ public class ExcelMappingFactory {
             }
         }
         if (propertyList.isEmpty()) {
-            throw new EasyPOIException("[{}]类未找到标注@ExportField注解的属性!", clazz.getName());
+            throw new ExcelBootException("[{}]类未找到标注@ExportField注解的属性!", clazz.getName());
         }
         ExcelEntity excelMapping = new ExcelEntity();
         excelMapping.setPropertyList(propertyList);
+        excelMapping.setFileName(fileName);
         return excelMapping;
     }
 
