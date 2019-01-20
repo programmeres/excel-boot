@@ -1,5 +1,5 @@
 <p align="center" id="e-b">
-    <h1 align="center"><bigger>Excel-Boot</bigger></h1>
+    <h1 fontSize="3em" align="center"><bigger>Excel-Boot</bigger></h1>
     <br>
     <p align="center">
         <a href="https://github.com/programmeres/easy-poi/releases">
