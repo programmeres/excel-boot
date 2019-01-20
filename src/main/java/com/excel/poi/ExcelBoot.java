@@ -47,6 +47,7 @@ public class ExcelBoot {
     private Integer pageSize;
     private Integer rowAccessWindowSize;
     private Integer recordCountPerSheet;
+    private Boolean openAutoColumWidth;
 
     /**
      * 导入构造器
@@ -55,7 +56,7 @@ public class ExcelBoot {
      * @param excelClass
      */
     protected ExcelBoot(InputStream inputStream, Class excelClass) {
-        this(null, null, inputStream, null, excelClass, null, null, null);
+        this(null, null, inputStream, null, excelClass, null, null, null, null);
     }
 
     /**
@@ -66,7 +67,7 @@ public class ExcelBoot {
      * @param excelClass
      */
     protected ExcelBoot(OutputStream outputStream, String fileName, Class excelClass) {
-        this(null, outputStream, null, fileName, excelClass, Constant.DEFAULT_PAGE_SIZE, Constant.DEFAULT_ROW_ACCESS_WINDOW_SIZE, Constant.DEFAULT_RECORD_COUNT_PEER_SHEET);
+        this(null, outputStream, null, fileName, excelClass, Constant.DEFAULT_PAGE_SIZE, Constant.DEFAULT_ROW_ACCESS_WINDOW_SIZE, Constant.DEFAULT_RECORD_COUNT_PEER_SHEET, Constant.OPEN_AUTO_COLUM_WIDTH);
     }
 
     /**
@@ -77,7 +78,7 @@ public class ExcelBoot {
      * @param excelClass
      */
     protected ExcelBoot(HttpServletResponse response, String fileName, Class excelClass) {
-        this(response, null, null, fileName, excelClass, Constant.DEFAULT_PAGE_SIZE, Constant.DEFAULT_ROW_ACCESS_WINDOW_SIZE, Constant.DEFAULT_RECORD_COUNT_PEER_SHEET);
+        this(response, null, null, fileName, excelClass, Constant.DEFAULT_PAGE_SIZE, Constant.DEFAULT_ROW_ACCESS_WINDOW_SIZE, Constant.DEFAULT_RECORD_COUNT_PEER_SHEET, Constant.OPEN_AUTO_COLUM_WIDTH);
     }
 
     /**
@@ -91,9 +92,10 @@ public class ExcelBoot {
      * @param pageSize
      * @param rowAccessWindowSize
      * @param recordCountPerSheet
+     * @param openAutoColumWidth
      */
     protected ExcelBoot(HttpServletResponse response, OutputStream outputStream, InputStream inputStream
-            , String fileName, Class excelClass, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet) {
+            , String fileName, Class excelClass, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth) {
         this.httpServletResponse = response;
         this.outputStream = outputStream;
         this.inputStream = inputStream;
@@ -102,6 +104,7 @@ public class ExcelBoot {
         this.pageSize = pageSize;
         this.rowAccessWindowSize = rowAccessWindowSize;
         this.recordCountPerSheet = recordCountPerSheet;
+        this.openAutoColumWidth = openAutoColumWidth;
     }
 
     /**
@@ -126,6 +129,42 @@ public class ExcelBoot {
      */
     public static ExcelBoot ExportBuilder(OutputStream outputStream, String fileName, Class clazz) {
         return new ExcelBoot(outputStream, fileName, clazz);
+    }
+
+    /**
+     * HttpServletResponse 通用生成excel文件
+     *
+     * @param response
+     * @param fileName
+     * @param excelClass
+     * @param pageSize
+     * @param rowAccessWindowSize
+     * @param recordCountPerSheet
+     * @param openAutoColumWidth
+     * @return
+     */
+    public static ExcelBoot ExportBuilder(HttpServletResponse response, String fileName, Class excelClass,
+                                          Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth) {
+        return new ExcelBoot(response, null, null
+                , fileName, excelClass, pageSize, rowAccessWindowSize, recordCountPerSheet, openAutoColumWidth);
+    }
+
+    /**
+     * OutputStream 通用生成excel文件
+     *
+     * @param outputStream
+     * @param fileName
+     * @param excelClass
+     * @param pageSize
+     * @param rowAccessWindowSize
+     * @param recordCountPerSheet
+     * @param openAutoColumWidth
+     * @return
+     */
+    public static ExcelBoot ExportBuilder(OutputStream outputStream, String fileName, Class excelClass, Integer pageSize
+            , Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth) {
+        return new ExcelBoot(null, outputStream, null
+                , fileName, excelClass, pageSize, rowAccessWindowSize, recordCountPerSheet, openAutoColumWidth);
     }
 
     /**
@@ -311,7 +350,7 @@ public class ExcelBoot {
                 verifyResponse();
                 verifyParams();
                 ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass, fileName);
-                ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
+                ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet, openAutoColumWidth);
                 sxssfWorkbook = excelWriter.generateTemplateWorkbook();
                 download(sxssfWorkbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
             } finally {
@@ -357,14 +396,14 @@ public class ExcelBoot {
     private <R, T> SXSSFWorkbook commonSingleSheet(R param, ExportFunction<R, T> exportFunction) throws Exception {
         verifyParams();
         ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass, fileName);
-        ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
+        ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet, openAutoColumWidth);
         return excelWriter.generateWorkbook(param, exportFunction);
     }
 
     private <R, T> SXSSFWorkbook commonMultiSheet(R param, ExportFunction<R, T> exportFunction) throws Exception {
         verifyParams();
         ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass, fileName);
-        ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet);
+        ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet, openAutoColumWidth);
         return excelWriter.generateMultiSheetWorkbook(param, exportFunction);
     }
 

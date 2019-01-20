@@ -32,6 +32,10 @@ public final class Constant {
      * 分Sheet条数
      */
     public static final int DEFAULT_RECORD_COUNT_PEER_SHEET = 80000;
+    /**
+     * 是否开启自动适配宽度
+     */
+    public static final boolean OPEN_AUTO_COLUM_WIDTH = true;
 
     public static final String CELL = "c";
     public static final String XYZ_LOCATION = "r";

@@ -49,7 +49,7 @@ Excel-Boot是一款Excel导入导出解决方案组成的轻量级开源组件�
 
 5.内置常用正则表达式类RegexConst（身份证号、手机号、金额、邮件）
 
-6.适配单元格宽度(单元格内容超过20个汉字不再进行增加宽度)
+6.可配置是否适配单元格宽度, 默认开启(单元格内容超过20个汉字不再增加宽度, 3万条11列数据, 耗时50ms左右, 用时与数据量成正比)
 
 7.假如出现异常,Sheet、行、列位置也都一并打印
 
@@ -99,14 +99,31 @@ Excel-Boot是一款Excel导入导出解决方案组成的轻量级开源组件�
 
 
 ## 扩展
-继承ExcelBoot类, 可以使用子类构造器覆盖以下默认参数
+1.新建子类继承ExcelBoot类, 使用子类构造器覆盖以下默认参数, 作为通用配置
+
+2.直接调用以下两个构造器, 用于临时修改配置
 ```java
-    //Excel自动刷新到磁盘的数量
+ExportBuilder(HttpServletResponse response, String fileName, Class excelClass, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth)
+
+ExportBuilder(OutputStream outputStream, String fileName, Class excelClass, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth)
+```
+```java
+    /**
+     * Excel自动刷新到磁盘的数量
+     */
     public static final int DEFAULT_ROW_ACCESS_WINDOW_SIZE = 2000;
-    //分页条数
+    /**
+     * 分页条数
+     */
     public static final int DEFAULT_PAGE_SIZE = 3000;
-    //分Sheet条数
+    /**
+     * 分Sheet条数
+     */
     public static final int DEFAULT_RECORD_COUNT_PEER_SHEET = 80000;
+    /**
+     * 是否开启自动适配宽度
+     */
+    public static final boolean OPEN_AUTO_COLUM_WIDTH = true;
 ```
 ## 版本
 当前为2.0版本, 新版本正在开发

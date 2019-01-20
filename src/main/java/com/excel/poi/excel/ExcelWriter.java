@@ -65,13 +65,14 @@ public class ExcelWriter {
     private Integer recordCountPerSheet;
     private XSSFCellStyle headCellStyle;
     private Map<Integer, Integer> columnWidthMap = new HashMap<Integer, Integer>();
+    private Boolean openAutoColumWidth;
 
-
-    public ExcelWriter(ExcelEntity excelEntity, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet) {
+    public ExcelWriter(ExcelEntity excelEntity, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth) {
         this.excelEntity = excelEntity;
         this.pageSize = pageSize;
         this.rowAccessWindowSize = rowAccessWindowSize;
         this.recordCountPerSheet = recordCountPerSheet;
+        this.openAutoColumWidth = openAutoColumWidth;
     }
 
     /**
@@ -234,9 +235,11 @@ public class ExcelWriter {
      * @param columnIndex
      */
     private void sizeColumWidth(SXSSFSheet sheet, Integer columnSize) {
-        for (int j = 0; j < columnSize; j++) {
-            if (columnWidthMap.get(j) != null) {
-                sheet.setColumnWidth(j, columnWidthMap.get(j) * 256);
+        if (openAutoColumWidth) {
+            for (int j = 0; j < columnSize; j++) {
+                if (columnWidthMap.get(j) != null) {
+                    sheet.setColumnWidth(j, columnWidthMap.get(j) * 256);
+                }
             }
         }
     }
@@ -249,11 +252,15 @@ public class ExcelWriter {
      * @param columnIndex
      */
     private void calculateColumWidth(SXSSFCell cell, Integer columnIndex) {
-        int length = cell.getStringCellValue().getBytes().length;
-        length = Math.max(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MIN);
-        length = Math.min(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MAX);
-        if (columnWidthMap.get(columnIndex) == null || columnWidthMap.get(columnIndex) < length) {
-            columnWidthMap.put(columnIndex, length);
+        if (openAutoColumWidth) {
+            String cellValue = cell.getStringCellValue();
+            int length = cellValue.getBytes().length;
+            length += (int)Math.ceil((double)((cellValue.length() * 3 - length) / 2) * 0.1D);
+            length = Math.max(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MIN);
+            length = Math.min(length, CHINESES_ATUO_SIZE_COLUMN_WIDTH_MAX);
+            if (columnWidthMap.get(columnIndex) == null || columnWidthMap.get(columnIndex) < length) {
+                columnWidthMap.put(columnIndex, length);
+            }
         }
     }
 
