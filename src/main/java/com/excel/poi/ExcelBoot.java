@@ -198,7 +198,7 @@ public class ExcelBoot {
                 if (sxssfWorkbook != null) {
                     sxssfWorkbook.close();
                 }
-                if (httpServletResponse.getOutputStream() != null) {
+                if (httpServletResponse != null && httpServletResponse.getOutputStream() != null) {
                     httpServletResponse.getOutputStream().close();
                 }
             }
@@ -357,7 +357,7 @@ public class ExcelBoot {
                 if (sxssfWorkbook != null) {
                     sxssfWorkbook.close();
                 }
-                if (httpServletResponse.getOutputStream() != null) {
+                if (httpServletResponse != null && httpServletResponse.getOutputStream() != null) {
                     httpServletResponse.getOutputStream().close();
                 }
             }
