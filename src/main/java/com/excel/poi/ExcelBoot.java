@@ -132,7 +132,7 @@ public class ExcelBoot {
     }
 
     /**
-     * HttpServletResponse 通用生成excel文件
+     * HttpServletResponse 通用导出Excel构造器
      *
      * @param response
      * @param fileName
@@ -150,7 +150,7 @@ public class ExcelBoot {
     }
 
     /**
-     * OutputStream 通用生成excel文件
+     * OutputStream 通用导出Excel构造器
      *
      * @param outputStream
      * @param fileName

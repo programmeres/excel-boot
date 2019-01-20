@@ -103,8 +103,13 @@ Excel-Boot是一款Excel导入导出解决方案组成的轻量级开源组件�
 
 2.直接调用以下两个构造器, 用于临时修改配置
 ```java
+/**
+* HttpServletResponse 通用导出Excel构造器
+*/
 ExportBuilder(HttpServletResponse response, String fileName, Class excelClass, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth)
-
+/**
+* OutputStream 通用导出Excel构造器
+*/
 ExportBuilder(OutputStream outputStream, String fileName, Class excelClass, Integer pageSize, Integer rowAccessWindowSize, Integer recordCountPerSheet, Boolean openAutoColumWidth)
 ```
 ```java
