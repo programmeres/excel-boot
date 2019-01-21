@@ -19,7 +19,6 @@
     </p>    
 </p>
 
-
 **Excel-Boot是一款Excel导入导出解决方案组成的轻量级开源组件。**
 
 **如果喜欢或愿意使用, 请star本项目或者点击donate图标捐赠我们**
@@ -31,9 +30,12 @@
 
 ## 开源库（同步更新）：
 
-GitHub：https://github.com/programmeres/excel-boot
+GitHub：<https://github.com/programmeres/excel-boot>
 
-码云：https://gitee.com/nw1992/easy-poi
+码云：
+<a href="https://gitee.com/nw1992/easy-poi">
+   https://gitee.com/nw1992/excel-boot
+</a>
 
 ## 功能简介
 1. 浏览器导出Excel文件（支持单/多sheet）
@@ -54,7 +56,6 @@ GitHub：https://github.com/programmeres/excel-boot
 3.解决含有占位符的空假行造成的读空值问题
 
 4.解决Long类型或者BigDecimal的精度不准问题
-
 
 ## 组件特色
 1.导入可以自定义解析成功或失败的处理逻辑
@@ -114,7 +115,6 @@ GitHub：https://github.com/programmeres/excel-boot
 6.标注属性类型要与数据库类型保持一致
 
 7.如果想提高性能, 并且内存允许、并发导出量不大, 可以根据实际场景适量改变分页条数和磁盘刷新量
-
 
 ## 扩展
 1.新建子类继承ExcelBoot类, 使用子类构造器覆盖以下默认参数, 作为通用配置
@@ -473,3 +473,5 @@ public class TestController {
     }
 }
 ```
+**建议功能投票列表**
+例：（内容）：（票数）
