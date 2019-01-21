@@ -30,14 +30,11 @@
 **如果有任何问题可以通过issue或者评论或者添加QQ群（716145748）告知我们, 尽力第一时间解决您的问题**
 ## 合作企业：
 
-## 开源库（同步更新）：
+## 开源库地址（同步更新）：
 
 GitHub：<https://github.com/programmeres/excel-boot>
 
-码云：
-<a href="https://gitee.com/nw1992/easy-poi">
-   https://gitee.com/nw1992/excel-boot
-</a>
+码云：<https://gitee.com/nw1992/easy-poi>
 
 ## 功能简介
 1. 浏览器导出Excel文件（支持单/多sheet）
@@ -476,4 +473,5 @@ public class TestController {
 }
 ```
 **建议功能投票列表**
+
 例：（功能描述）：（票数）
