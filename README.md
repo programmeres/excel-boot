@@ -30,6 +30,8 @@
 **如果有任何问题可以通过issue或者评论或者添加QQ群（716145748）告知我们, 尽力第一时间解决您的问题**
 ## 合作企业：
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3a1ec066e9a542f682f61309ea10d820)](https://app.codacy.com/app/programmeres/excel-boot?utm_source=github.com&utm_medium=referral&utm_content=programmeres/excel-boot&utm_campaign=Badge_Grade_Dashboard)
+
 ## 开源库地址（同步更新）：
 
 GitHub：<https://github.com/programmeres/excel-boot>
