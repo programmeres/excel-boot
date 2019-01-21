@@ -31,7 +31,7 @@
 
 ## 开源库（同步更新）：
 
-GitHub地址：https://github.com/programmeres/excel-boot
+GitHub：https://github.com/programmeres/excel-boot
 
 码云：https://gitee.com/nw1992/easy-poi
 
