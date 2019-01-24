@@ -448,7 +448,7 @@ public class TestController {
     @RequestMapping("/importExcel")
     public void importExcel() throws IOException {
         ExcelBoot.ImportBuilder(new FileInputStream(new File("C:\\Users\\导入Excel文件.xlsx")),  UserEntity.class)
-                .importExcel(new ExcelImportFunction<UserEntity>() {
+                .importExcel(new ImportFunction<UserEntity>() {
 
                     /**
                      * @param sheetIndex 当前执行的Sheet的索引, 从1开始
