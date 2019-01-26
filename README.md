@@ -25,9 +25,7 @@
 
 **如果是企业使用, 为了产品推广, 请通过评论、Issue、PullRequest README的合作企业告诉我们企业名称**
 
-**如果有功能需求, 请修改页面底部的<建议功能投票列表>进行投票**
-
-**如果有任何问题可以通过issue或者评论或者添加QQ群（716145748）告知我们, 尽力第一时间解决您的问题**
+**请先仔细阅读本说明, 然后如果有任何问题或者建议可以通过issue、添加QQ群（716145748）告知我们, 尽力第一时间解决您的问题**
 ## 合作企业：
 
 ## 开源库地址（同步更新）：
@@ -148,7 +146,7 @@ ExportBuilder(OutputStream outputStream, String fileName, Class excelClass, Inte
     public static final boolean OPEN_AUTO_COLUM_WIDTH = true;
 ```
 ## 版本
-当前为2.0版本, 新版本正在开发
+当前为2.0版本, 新版本正在开发（包括：导出Word、PDF、单元格合并等）
 
 ## 使用手册
 1.引入Maven依赖
@@ -170,6 +168,21 @@ ExportBuilder(OutputStream outputStream, String fileName, Class excelClass, Inte
 ```java
 /**
 * 导出导入实体对象
+* 
+* 导出注解说明
+* columnName:导出Excel列名
+* scale:导出BigDecimal类型格式化精度
+* roundingMode:导出BigDecimal类型舍入规则
+* dateFormat:导出Data类型格式化模式
+* defaultCellValue:导出模板默认值
+* 
+* 导入注解说明
+* required:是否非空校验
+* regex:正则校验规则
+* regexMessage:正则校验失败信息
+* scale:导出BigDecimal类型格式化精度
+* roundingMode:导出BigDecimal类型舍入规则
+* dateFormat:导出Data类型格式化模式
 */
 public class UserEntity {
 /**
@@ -208,8 +221,8 @@ public class UserEntity {
  * ResultEntity是数据层查询到的List内部元素
  * UserEntity可以和ResultEntity使用同一个对象,即直接在数据层查询的结果对象上标注注解(建议使用两个对象, 实现解耦)
  * 
- * pageQuery方法是用户自己实现, 根据查询条件和当前页数和每页条数进行数据层查询
- * convert方法是用户自己实现, 参数就是您查询出来的list中的每个元素引用, 您可以对对象属性的转换或者对象的转换, 如果不进行转换,直接返回参数对象即可
+ * pageQuery方法是用户自己实现, 即导出Excel的数据来源, 根据查询条件和当前页数和每页条数进行数据层查询, 当返回List的条数为NULL或者小于DEFAULT_PAGE_SIZE(每页条数)时, 将视为查询结束, 反之则会发生死循环 
+ * convert方法是用户自己实现, 参数就是您查询出来的list中的每个元素引用, 您可以对对象属性的转换或者对象的转换, 但是必须返回标注注解的对象
  */
 @Controller
 @RequestMapping("/export")
@@ -234,8 +247,8 @@ public class TestController {
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
-
-                        return new ArrayList<ResultEntity>();
+                        List<ResultEntity> result=dao().queryPage(queryQaram);
+                        return result;
                     }
 
                     /**
@@ -246,6 +259,7 @@ public class TestController {
                     @Override
                     public UserEntity convert(ResultEntity o) {
                         //转换操作
+                        return new UserEntity();
                     }
                 });
     }
@@ -270,8 +284,8 @@ public class TestController {
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
-
-                        return new ArrayList<ResultEntity>();
+                        List<ResultEntity> result=dao().queryPage(queryQaram);
+                        return result;
                     }
 
                     /**
@@ -282,6 +296,7 @@ public class TestController {
                     @Override
                     public UserEntity convert(ResultEntity o) {
                         //转换操作
+                        return new UserEntity();
                     }
                 });
     }
@@ -304,8 +319,8 @@ public class TestController {
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
-
-                        return new ArrayList<ResultEntity>();
+                        List<ResultEntity> result=dao().queryPage(queryQaram);
+                        return result;
                     }
 
                     /**
@@ -316,6 +331,7 @@ public class TestController {
                     @Override
                     public UserEntity convert(ResultEntity o) {
                         //转换操作
+                        return new UserEntity();
                     }
                 });
     }
@@ -338,8 +354,8 @@ public class TestController {
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
-
-                        return new ArrayList<ResultEntity>();
+                        List<ResultEntity> result=dao().queryPage(queryQaram);
+                        return result;
                     }
 
                     /**
@@ -350,6 +366,7 @@ public class TestController {
                     @Override
                     public UserEntity convert(ResultEntity o) {
                         //转换操作
+                        return new UserEntity();
                     }
                 });
     }
@@ -372,8 +389,8 @@ public class TestController {
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
-
-                        return new ArrayList<ResultEntity>();
+                        List<ResultEntity> result=dao().queryPage(queryQaram);
+                        return result;
                     }
 
                     /**
@@ -384,6 +401,7 @@ public class TestController {
                     @Override
                     public UserEntity convert(ResultEntity o) {
                         //转换操作
+                        return new UserEntity();
                     }
                 });
     }
@@ -406,8 +424,8 @@ public class TestController {
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
                         //分页查询操作
-
-                        return new ArrayList<ResultEntity>();
+                        List<ResultEntity> result=dao().queryPage(queryQaram);
+                        return result;
                     }
 
                     /**
@@ -418,6 +436,7 @@ public class TestController {
                     @Override
                     public UserEntity convert(ResultEntity o) {
                         //转换操作
+                        return new UserEntity();
                     }
                 });
     }
@@ -436,11 +455,11 @@ public class TestController {
 /**
  * 导入api-Demo
  * 
- * UserEntity是标注注解的类, Excel映射的导入类, onProcess的userEntity参数则是Excel每行数据的映射实体
+ * UserEntity是标注注解的类, Excel的导入映射类, onProcess的userEntity参数则是Excel每行数据的映射实体
  * ErrorEntity是封装了每行Excel数据常规校验后的错误信息实体, 封装了sheet号、行号、列号、单元格值、所属列名、错误信息
  * 
- * onProcess方法是用户自己实现, 当经过正则或者判空常规校验成功后执行的方法,参数是每行数据映射的实体
- * convert方法是用户自己实现, 当经过正则或者判空常规校验失败后执行的方法
+ * onProcess方法是用户自己实现, 当经过正则或者判空常规校验成功后执行的方法, 参数是每行数据映射的实体
+ * onError方法是用户自己实现, 当经过正则或者判空常规校验失败后执行的方法
  */
 @Controller
 @RequestMapping("/import")
@@ -453,7 +472,7 @@ public class TestController {
                     /**
                      * @param sheetIndex 当前执行的Sheet的索引, 从1开始
                      * @param rowIndex 当前执行的行数, 从1开始
-                     * @param resultEntity Excel行数据的实体
+                     * @param userEntity Excel行数据的实体
                      */
                     @Override
                     public void onProcess(int sheetIndex,  int rowIndex,  UserEntity userEntity) {
@@ -472,6 +491,3 @@ public class TestController {
     }
 }
 ```
-**建议功能投票列表**
-
-例：(解决问题):（功能描述）：（票数）
