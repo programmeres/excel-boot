@@ -1,5 +1,5 @@
 <p align="center" id="e-b">
-<img src="https://gitee.com/magicCore/codes/fb2jiwvrqlkcsotynpmdx78/raw?blob_name=excel-boot.png" >
+<img src="https://raw.githubusercontent.com/magic-core/logo/master/excel-boot.png" >
     <p align="center">
         <a href="https://github.com/programmeres/easy-poi/releases">
             <img src="https://img.shields.io/github/release/programmeres/easy-poi.svg" >
