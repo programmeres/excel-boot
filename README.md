@@ -151,9 +151,15 @@ ExportBuilder(OutputStream outputStream, String fileName, Class excelClass, Inte
 ## 使用手册
 1.引入Maven依赖
 
-2.将需要导出或者导入的实体属性上标注@ExportField或@ImportField注解
+2.将需要导出或者导入的实体属性上标注@ExportField或@ImportField注解,并根据自己需要编写属性
 
-3.直接调用导出或导入API即可
+3.在使用者项目相应的代码中粘贴相应的导出或者导入代码
+
+4.将Demo中注释标明："需要使用本组件的开发者自己定义的" 的替换成自己项目中的类
+
+5.将开发者自定义逻辑编写到导出pageQuery或者导入onProcess方法中
+
+6.将开发者自定义逻辑编写到导出convert或者导入onError方法中
 
 ### POM.xml 
 
@@ -217,6 +223,8 @@ public class UserEntity {
  * 导入Demo
  * 
  * UserEntity是标注注解的类, Excel的导入映射类, onProcess的userEntity参数则是Excel每行数据的映射实体
+ * 需要使用本组件的开发者自己定义
+ * 
  * ErrorEntity是封装了每行Excel数据常规校验后的错误信息实体, 封装了sheet号、行号、列号、单元格值、所属列名、错误信息
  * 
  * onProcess方法是用户自己实现, 当经过正则或者判空常规校验成功后执行的方法, 参数是每行数据映射的实体
@@ -237,8 +245,8 @@ public class TestController {
                      */
                     @Override
                     public void onProcess(int sheetIndex,  int rowIndex,  UserEntity userEntity) {
-                        //对每条数据自定义校验以及操作
-                        //分页插入：当读取行数到达用户自定义条数执行插入数据库操作
+                        //将读取到Excel中每一行的userEntity数据进行自定义处理
+                        //如果该行数据发生问题,将不会走本方法,而会走onError方法
                     }
 
                     /**
@@ -246,7 +254,7 @@ public class TestController {
                      */
                     @Override
                     public void onError(ErrorEntity errorEntity) {
-                        //操作每条数据非空和正则校验后的错误信息
+                        //将每条数据非空和正则校验后的错误信息errorEntity进行自定义处理
                     }
                 });
     }
@@ -258,9 +266,13 @@ public class TestController {
  * 导出Demo
  * 
  * UserEntity是标注注解的类,Excel映射的导出类
- * ParamEntity是数据层查询的参数对象
- * ResultEntity是数据层查询到的List内部元素
- * UserEntity可以和ResultEntity使用同一个对象,即直接在数据层查询的结果对象上标注注解(建议使用两个对象, 实现解耦)
+ * 需要使用本组件的开发者自己定义
+ * ParamEntity是查询的参数对象
+ * 需要使用本组件的开发者自己定义
+ * ResultEntity是查询到的结果List内部元素
+ * 需要使用本组件的开发者自己定义
+ * 
+ * UserEntity可以和ResultEntity使用同一个对象,即直接在查询的结果对象上标注注解(建议使用两个对象, 实现解耦)
  * 
  * pageQuery方法是用户自己实现, 即导出Excel的数据来源, 根据查询条件和当前页数和每页条数进行数据层查询, 当返回List的条数为NULL或者小于DEFAULT_PAGE_SIZE(每页条数)时, 将视为查询结束, 反之则会发生死循环 
  * convert方法是用户自己实现, 参数就是您查询出来的list中的每个元素引用, 您可以对对象属性的转换或者对象的转换, 但是必须返回标注注解的对象
@@ -286,9 +298,11 @@ public class TestController {
                      */
                     @Override
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
-
-                        //分页查询操作
+                        //1.将pageNum和pageSize传入使用本组件的开发者自己项目的分页逻辑中
+                        
+                        //2.调用使用本组件的开发者自己项目的分页查询方法
                         List<ResultEntity> result=dao().queryPage(queryQaram);
+                        
                         return result;
                     }
 
@@ -299,7 +313,7 @@ public class TestController {
                      */
                     @Override
                     public UserEntity convert(ResultEntity o) {
-                        //转换操作
+                        //用于编写开发者自定义的转换逻辑
                         return new UserEntity();
                     }
                 });
@@ -324,7 +338,9 @@ public class TestController {
                     @Override
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
-                        //分页查询操作
+                        //1.将pageNum和pageSize传入使用本组件的开发者自己项目的分页逻辑中
+                        
+                        //2.调用使用本组件的开发者自己项目的分页查询方法
                         List<ResultEntity> result=dao().queryPage(queryQaram);
                         return result;
                     }
@@ -336,7 +352,7 @@ public class TestController {
                      */
                     @Override
                     public UserEntity convert(ResultEntity o) {
-                        //转换操作
+                        //用于编写开发者自定义的转换逻辑
                         return new UserEntity();
                     }
                 });
@@ -359,7 +375,9 @@ public class TestController {
                     @Override
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
-                        //分页查询操作
+                        //1.将pageNum和pageSize传入使用本组件的开发者自己项目的分页逻辑中
+                        
+                        //2.调用使用本组件的开发者自己项目的分页查询方法
                         List<ResultEntity> result=dao().queryPage(queryQaram);
                         return result;
                     }
@@ -371,7 +389,7 @@ public class TestController {
                      */
                     @Override
                     public UserEntity convert(ResultEntity o) {
-                        //转换操作
+                        //用于编写开发者自定义的转换逻辑
                         return new UserEntity();
                     }
                 });
@@ -394,7 +412,9 @@ public class TestController {
                     @Override
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
-                        //分页查询操作
+                        //1.将pageNum和pageSize传入使用本组件的开发者自己项目的分页逻辑中
+                        
+                        //2.调用使用本组件的开发者自己项目的分页查询方法
                         List<ResultEntity> result=dao().queryPage(queryQaram);
                         return result;
                     }
@@ -406,7 +426,7 @@ public class TestController {
                      */
                     @Override
                     public UserEntity convert(ResultEntity o) {
-                        //转换操作
+                        //用于编写开发者自定义的转换逻辑
                         return new UserEntity();
                     }
                 });
@@ -429,7 +449,9 @@ public class TestController {
                     @Override
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
-                        //分页查询操作
+                        //1.将pageNum和pageSize传入使用本组件的开发者自己项目的分页逻辑中
+                        
+                        //2.调用使用本组件的开发者自己项目的分页查询方法
                         List<ResultEntity> result=dao().queryPage(queryQaram);
                         return result;
                     }
@@ -441,7 +463,7 @@ public class TestController {
                      */
                     @Override
                     public UserEntity convert(ResultEntity o) {
-                        //转换操作
+                        //用于编写开发者自定义的转换逻辑
                         return new UserEntity();
                     }
                 });
@@ -464,7 +486,9 @@ public class TestController {
                     @Override
                     public List<ResultEntity> pageQuery(ParamEntity queryQaram, int pageNum, int pageSize) {
 
-                        //分页查询操作
+                        //1.将pageNum和pageSize传入使用本组件的开发者自己项目的分页逻辑中
+                        
+                        //2.调用使用本组件的开发者自己项目的分页查询方法
                         List<ResultEntity> result=dao().queryPage(queryQaram);
                         return result;
                     }
@@ -476,7 +500,7 @@ public class TestController {
                      */
                     @Override
                     public UserEntity convert(ResultEntity o) {
-                        //转换操作
+                        //用于编写开发者自定义的转换逻辑
                         return new UserEntity();
                     }
                 });
