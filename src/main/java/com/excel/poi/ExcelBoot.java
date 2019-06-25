@@ -17,6 +17,7 @@
 package com.excel.poi;
 
 import com.excel.poi.common.Constant;
+import com.excel.poi.common.WebFilenameUtils;
 import com.excel.poi.entity.ExcelEntity;
 import com.excel.poi.excel.ExcelReader;
 import com.excel.poi.excel.ExcelWriter;
@@ -193,7 +194,7 @@ public class ExcelBoot {
             try {
                 verifyResponse();
                 sxssfWorkbook = commonSingleSheet(param, exportFunction);
-                download(sxssfWorkbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
+                download(sxssfWorkbook, httpServletResponse, fileName + ".xlsx");
             } finally {
                 if (sxssfWorkbook != null) {
                     sxssfWorkbook.close();
@@ -273,7 +274,7 @@ public class ExcelBoot {
             try {
                 verifyResponse();
                 sxssfWorkbook = commonMultiSheet(param, exportFunction);
-                download(sxssfWorkbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
+                download(sxssfWorkbook, httpServletResponse, fileName + ".xlsx");
             } finally {
                 if (sxssfWorkbook != null) {
                     sxssfWorkbook.close();
@@ -352,7 +353,7 @@ public class ExcelBoot {
                 ExcelEntity excelMapping = ExcelMappingFactory.loadExportExcelClass(excelClass, fileName);
                 ExcelWriter excelWriter = new ExcelWriter(excelMapping, pageSize, rowAccessWindowSize, recordCountPerSheet, openAutoColumWidth);
                 sxssfWorkbook = excelWriter.generateTemplateWorkbook();
-                download(sxssfWorkbook, httpServletResponse, URLEncoder.encode(fileName + ".xlsx", "UTF-8"));
+                download(sxssfWorkbook, httpServletResponse, fileName + ".xlsx");
             } finally {
                 if (sxssfWorkbook != null) {
                     sxssfWorkbook.close();
@@ -432,7 +433,7 @@ public class ExcelBoot {
         OutputStream out = response.getOutputStream();
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-disposition",
-                String.format("attachment; filename=%s", filename));
+                WebFilenameUtils.disposition(filename));
         if (null != out) {
             wb.write(out);
             out.flush();
